@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thi Th? Cu?i K? - Gi?i Tích 1 UTC</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+        .timer-box { position: fixed; top: 20px; right: 20px; background: #ff4d4d; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .quiz-form { margin-top: 20px; }
+        .question { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
+        .question-title { font-weight: 600; margin-bottom: 10px; color: #333; }
+        .options { display: flex; flex-direction: column; gap: 8px; }
+        .option { background: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .option:hover { background: #e9ecef; }
+        .btn-submit { display: block; width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; }
+        .btn-submit:hover { background: #218838; }
+        .result-box { display: none; margin-top: 20px; padding: 20px; background: #e2f0d9; border-left: 5px solid #385723; border-radius: 4px; text-align: center; font-size: 1.2rem; font-weight: bold; color: #385723; }
+    </style>
+</head>
+<body>
+
+<div class="timer-box">Th?i gian: <span id="time-display">60:00</span></div>
+
+<div class="container">
+    <h1>THI TH? CU?I K? GI?I TÍCH 1</h1>
+    <p class="subtitle">Tru?ng Ð?i h?c Giao thông V?n t?i (UTC) | Th?i gian: 60 phút</p>
+    
+    <div id="quiz-container" class="quiz-form">
+        <!-- Câu h?i s? t? d?ng sinh t? JavaScript ? dây -->
+    </div>
+
+    <button class="btn-submit" onclick="submitQuiz()">N?p Bài & Ch?m Ði?m</button>
+    <div id="result" class="result-box"></div>
+</div>
+
+<script>
+    // Co s? d? li?u câu h?i d? thi
+    const quizData = [
+        {
+            question: "Câu 1: Tính gi?i h?n L = lim (x -> 0) [ln(1 + 3x) / 2x].",
+            options: ["3", "3/2", "2/3", "0"],
+            correct: 1
+        },
+        {
+            question: "Câu 2: Cho hàm s? f(x) = x^e + e^x. Tính d?o hàm f'(1).",
+            options: ["e + 1", "e^2", "2e", "e + e^e"],
+            correct: 2
+        },
+        {
+            question: "Câu 3: Tìm h? nguyên hàm c?a hàm s? f(x) = x * e^(x^2).",
+            options: ["e^(x^2) + C", "1/2 * e^(x^2) + C", "x^2 * e^(x^2) + C", "1/2 * x^2 * e^(x^2) + C"],
+            correct: 1
+        }
+    ];
+
+    // Hi?n th? câu h?i ra màn hình
+    const quizContainer = document.getElementById('quiz-container');
+    function loadQuiz() {
+        let html = '';
+        quizData.forEach((q, qIdx) => {
+            html += `
+                <div class="question">
+                    <div class="question-title">${q.question}</div>
+                    <div class="options">
+            `;
+            q.options.forEach((opt, oIdx) => {
+                html += `
+                    <label class="option">
+                        <input type="radio" name="question${qIdx}" value="${oIdx}">
+                        ${opt}
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
+        });
+        quizContainer.innerHTML = html;
+    }
+
+    // Ð?m ngu?c th?i gian (60 phút)
+    let timeLeft = 60 * 60;
+    const timeDisplay = document.getElementById('time-display');
+    const timerInterval = setInterval(() => {
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        timeDisplay.innerText = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("H?t gi? làm bài! H? th?ng t? d?ng n?p bài.");
+            submitQuiz();
+        }
+        timeLeft--;
+    }, 1000);
+
+    // X? lý n?p bài và tính di?m
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        let score = 0;
+        quizData.forEach((q, qIdx) => {
+            const selected = document.querySelector(`input[name="question${qIdx}"]:checked`);
+            if (selected && parseInt(selected.value) === q.correct) {
+                score++;
+            }
+        });
+        
+        const resultBox = document.getElementById('result');
+        resultBox.style.display = 'block';
+        resultBox.innerHTML = `K?t qu? c?a b?n: ${score}/${quizData.length} câu dúng. <br> Ði?m s?: ${(score/quizData.length * 10).toFixed(2)} / 10 di?m.`;
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Ch?y hàm t?i câu h?i khi web du?c m?
+    loadQuiz();
+</script>
+
+</body>
+</html>
+
